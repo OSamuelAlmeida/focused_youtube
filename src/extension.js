@@ -6,13 +6,14 @@
 // an error "Can't use import statement outside a module".
 
 const readStorageKeys = (storageKeys, callback) => {
-  chrome.storage.local.get(storageKeys, function(result) {
+  chrome.storage.local.get(storageKeys, function (result) {
     callback(result)
   })
 }
 
 const SETTINGS_COMMENTS_KEY = "settings:comments"
 const INFINITE_SCROLL_KEY = "settings:infinite_scroll"
+const ENABLED_KEY = "settings:enabled"
 
 import "./style-overrides.css"
 
@@ -21,7 +22,7 @@ document.body.style.display = "block"
 let currentUrl = window.location.href
 
 let cleanUpFYClasses = () => {
-  document.body.classList.forEach(className => {
+  document.body.classList.forEach((className) => {
     if (className.startsWith("fy-")) {
       document.body.classList.remove(className)
     }
@@ -34,23 +35,37 @@ const enableTheaterMode = () => {
   oneYearFromNow.setFullYear(oneYearFromNow.getFullYear() + 1)
 
   document.cookie = "wide=; Max-Age=0; path=/; domain=.youtube.com"
-  document.cookie = "wide=1; expires="+oneYearFromNow.toUTCString()+"; path=/; domain=.youtube.com"
+  document.cookie =
+    "wide=1; expires=" +
+    oneYearFromNow.toUTCString() +
+    "; path=/; domain=.youtube.com"
 }
 
 const initFY = () => {
-  cleanUpFYClasses()
+  readStorageKeys([ENABLED_KEY], (config) => {
+    if (!config[ENABLED_KEY]) {
+      cleanUpFYClasses()
+      return
+    } else {
+      cleanUpFYClasses()
 
-  enableTheaterMode()
+      enableTheaterMode()
 
-  if (window.location.pathname === "/") {
-    initHomePage()
-  } else if (window.location.pathname === "/results") {
-    initResultsPage()
-  } else if (window.location.pathname === "/watch") {
-    initWatchPage()
-  } else if (window.location.pathname.startsWith("/@") || window.location.pathname.startsWith("/channel")) {  // channel begins with /@ or /channel
-    initChannelPage()
-  }
+      if (window.location.pathname === "/") {
+        initHomePage()
+      } else if (window.location.pathname === "/results") {
+        initResultsPage()
+      } else if (window.location.pathname === "/watch") {
+        initWatchPage()
+      } else if (
+        window.location.pathname.startsWith("/@") ||
+        window.location.pathname.startsWith("/channel")
+      ) {
+        // channel begins with /@ or /channel
+        initChannelPage()
+      }
+    }
+  })
 }
 
 const initWatchPage = () => {
@@ -59,7 +74,7 @@ const initWatchPage = () => {
   readStorageKeys([SETTINGS_COMMENTS_KEY], (config) => {
     const $body = document.querySelector("body")
 
-    if(config[SETTINGS_COMMENTS_KEY]) {
+    if (config[SETTINGS_COMMENTS_KEY]) {
       $body.classList.add("fy-watch-page--comments-visible")
     } else {
       $body.classList.remove("fy-watch-page--comments-visible")
@@ -73,7 +88,7 @@ const initResultsPage = () => {
   readStorageKeys([INFINITE_SCROLL_KEY], (config) => {
     const $body = document.querySelector("body")
 
-    if(config[INFINITE_SCROLL_KEY]) {
+    if (config[INFINITE_SCROLL_KEY]) {
       $body.classList.add("fy-results-page--infinite-scroll-enabled")
     } else {
       $body.classList.remove("fy-results-page--infinite-scroll-enabled")
@@ -90,7 +105,9 @@ const initHomePage = () => {
     event.preventDefault()
 
     const query = anchor.querySelector(".fy-search-form__text-input").value
-    window.location.href = "https://www.youtube.com/results?search_query=" + encodeURIComponent(query)
+    window.location.href =
+      "https://www.youtube.com/results?search_query=" +
+      encodeURIComponent(query)
   }
 
   document.body.classList.add("fy-home-page")
@@ -134,22 +151,26 @@ const nodeMatchesSelector = (node, selector) => {
 }
 
 const observeDOM = (function () {
-  const MutationObserver = window.MutationObserver || window.WebKitMutationObserver
+  const MutationObserver =
+    window.MutationObserver || window.WebKitMutationObserver
   const eventListenerSupported = window.addEventListener
 
   return function (obj, selector, callback) {
     if (MutationObserver) {
       let obs = new MutationObserver(function (mutations) {
-        if(mutations[0].addedNodes.length &&
-          Array.from(mutations[0].addedNodes).some(node => nodeMatchesSelector(node, selector))) {
-
+        if (
+          mutations[0].addedNodes.length &&
+          Array.from(mutations[0].addedNodes).some((node) =>
+            nodeMatchesSelector(node, selector),
+          )
+        ) {
           callback()
         }
       })
 
       obs.observe(obj, {
         childList: true,
-        subtree: true
+        subtree: true,
       })
     } else if (eventListenerSupported) {
       obj.addEventListener("DOMNodeInserted", callback, false)
@@ -169,8 +190,10 @@ observeDOM(document.body, "*", function () {
 })
 
 const hideSectionByTitle = (titleText) => {
-  const sections = document.querySelectorAll("ytd-shelf-renderer.style-scope.ytd-item-section-renderer")
-  const section = Array.from(sections).find(section => {
+  const sections = document.querySelectorAll(
+    "ytd-shelf-renderer.style-scope.ytd-item-section-renderer",
+  )
+  const section = Array.from(sections).find((section) => {
     const title = section.querySelector("#title")
 
     if (title) {
@@ -185,29 +208,33 @@ const hideSectionByTitle = (titleText) => {
   }
 }
 
-observeDOM(document.body, "ytd-shelf-renderer.style-scope.ytd-item-section-renderer", function () {
-  hideSectionByTitle("For you")
-  hideSectionByTitle("Latest posts from")
-  hideSectionByTitle("Latest from")
-  hideSectionByTitle("Popular today")
-})
+observeDOM(
+  document.body,
+  "ytd-shelf-renderer.style-scope.ytd-item-section-renderer",
+  function () {
+    hideSectionByTitle("For you")
+    hideSectionByTitle("Latest posts from")
+    hideSectionByTitle("Latest from")
+    hideSectionByTitle("Popular today")
+  },
+)
 
 chrome.storage.onChanged.addListener((changes) => {
   for (let [key, { newValue }] of Object.entries(changes)) {
-    if(key === SETTINGS_COMMENTS_KEY) {
+    if (key === SETTINGS_COMMENTS_KEY) {
       const $body = document.querySelector("body")
 
-      if(newValue) {
+      if (newValue) {
         $body.classList.add("fy-watch-page--comments-visible")
       } else {
         $body.classList.remove("fy-watch-page--comments-visible")
       }
     }
 
-    if(key === INFINITE_SCROLL_KEY) {
+    if (key === INFINITE_SCROLL_KEY) {
       const $body = document.querySelector("body")
 
-      if(newValue) {
+      if (newValue) {
         $body.classList.add("fy-results-page--infinite-scroll-enabled")
       } else {
         $body.classList.remove("fy-results-page--infinite-scroll-enabled")

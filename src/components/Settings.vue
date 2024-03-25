@@ -1,53 +1,76 @@
 <script>
-import Toggle from "@components/Toggle.vue"
-import { INFINITE_SCROLL_KEY, SETTINGS_COMMENTS_KEY, writeStorageData, readStorageKey } from "@js/chrome-storage"
+  import Toggle from "@components/Toggle.vue"
+  import {
+    ENABLED_KEY,
+    INFINITE_SCROLL_KEY,
+    SETTINGS_COMMENTS_KEY,
+    readStorageKey,
+    writeStorageData,
+  } from "@js/chrome-storage"
 
-export default {
-  components: {
-    Toggle
-  },
-  data() {
-    return {
-      showCommentsToggle: false,
-      commentsSectionEnabled: false,
-      infiniteScrollEnabled: false,
-      showInfiniteScrollToggle: false
-    }
-  },
-  mounted() {
-    readStorageKey(SETTINGS_COMMENTS_KEY, (value) => {
-      if(typeof(value) === "undefined") {
-        this.commentsSectionEnabled = false
-      } else {
-        this.commentsSectionEnabled = value
+  export default {
+    components: {
+      Toggle,
+    },
+    data() {
+      return {
+        showCommentsToggle: false,
+        commentsSectionEnabled: false,
+        infiniteScrollEnabled: false,
+        showInfiniteScrollToggle: false,
+        showEnabled: false,
+        enabled: false,
       }
+    },
+    mounted() {
+      readStorageKey(SETTINGS_COMMENTS_KEY, (value) => {
+        if (typeof value === "undefined") {
+          this.commentsSectionEnabled = false
+        } else {
+          this.commentsSectionEnabled = value
+        }
 
-      this.showCommentsToggle = true
-    })
+        this.showCommentsToggle = true
+      })
 
-    readStorageKey(INFINITE_SCROLL_KEY, (value) => {
-      if(typeof(value) === "undefined") {
-        this.infiniteScrollEnabled = false
-      } else {
-        this.infiniteScrollEnabled = value
-      }
+      readStorageKey(INFINITE_SCROLL_KEY, (value) => {
+        if (typeof value === "undefined") {
+          this.infiniteScrollEnabled = false
+        } else {
+          this.infiniteScrollEnabled = value
+        }
 
-      this.showInfiniteScrollToggle = true
-    })
-  },
-  methods: {
-    handleCommentsToggle(val) {
-      writeStorageData(SETTINGS_COMMENTS_KEY, val, () => {
-        this.commentsSectionEnabled = val
+        this.showInfiniteScrollToggle = true
+      })
+
+      readStorageKey(ENABLED_KEY, (value) => {
+        if (typeof value === "undefined") {
+          this.enabled = true
+        } else {
+          this.enabled = value
+        }
+
+        this.showEnabled = true
       })
     },
-    handleInfiniteScrollToggle(val) {
-      writeStorageData(INFINITE_SCROLL_KEY, val, () => {
-        this.infiniteScrollEnabled = val
-      })
-    }
+    methods: {
+      handleCommentsToggle(val) {
+        writeStorageData(SETTINGS_COMMENTS_KEY, val, () => {
+          this.commentsSectionEnabled = val
+        })
+      },
+      handleInfiniteScrollToggle(val) {
+        writeStorageData(INFINITE_SCROLL_KEY, val, () => {
+          this.infiniteScrollEnabled = val
+        })
+      },
+      handleEnabledToggle(val) {
+        writeStorageData(ENABLED_KEY, val, () => {
+          this.enabled = val
+        })
+      },
+    },
   }
-}
 </script>
 
 <template>
@@ -59,7 +82,8 @@ export default {
         name="Comments section"
         class="focused-youtube-settings__toggle"
         :toggled="commentsSectionEnabled"
-        @toggle="handleCommentsToggle" />
+        @toggle="handleCommentsToggle"
+      />
 
       <Toggle
         v-if="showInfiniteScrollToggle"
@@ -67,23 +91,33 @@ export default {
         name="Infinite scroll"
         class="focused-youtube-settings__toggle"
         :toggled="infiniteScrollEnabled"
-        @toggle="handleInfiniteScrollToggle" />
+        @toggle="handleInfiniteScrollToggle"
+      />
+
+      <Toggle
+        v-if="showEnabled"
+        title="Enable extension"
+        name="Enabled"
+        class="focused-youtube-settings__toggle"
+        :toggled="enabled"
+        @toggle="handleEnabledToggle"
+      />
     </div>
   </div>
 </template>
 
 <style lang="scss" scoped>
-.focused-youtube-settings {
-  &__toggles {
-    display: flex;
-    flex-direction: column;
-    margin-bottom: 36px;
-  }
+  .focused-youtube-settings {
+    &__toggles {
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 36px;
+    }
 
-  &__toggle {
-    &:not(:last-child) {
-      margin-bottom: 24px;
+    &__toggle {
+      &:not(:last-child) {
+        margin-bottom: 24px;
+      }
     }
   }
-}
 </style>

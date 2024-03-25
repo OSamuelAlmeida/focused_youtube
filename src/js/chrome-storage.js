@@ -3,19 +3,20 @@
 // with an import statement fails with It fails with "Can't use import
 // statement outside a module".
 
+export const ENABLED_KEY = "settings:enabled"
 export const SETTINGS_COMMENTS_KEY = "settings:comments"
 export const INFINITE_SCROLL_KEY = "settings:infinite_scroll"
 
 export const writeStorageData = (storageKey, value, callback) => {
   chrome.storage.local.set({ [storageKey]: value }, () => {
-    if(callback) {
+    if (callback) {
       callback(value)
     }
   })
 }
 
 export const readStorageKey = (storageKey, callback) => {
-  chrome.storage.local.get([storageKey], function(result) {
+  chrome.storage.local.get([storageKey], function (result) {
     const value = result[storageKey]
 
     callback(value)
@@ -23,7 +24,7 @@ export const readStorageKey = (storageKey, callback) => {
 }
 
 export const readStorageKeys = (storageKeys, callback) => {
-  chrome.storage.local.get(storageKeys, function(result) {
+  chrome.storage.local.get(storageKeys, function (result) {
     callback(result)
   })
 }
