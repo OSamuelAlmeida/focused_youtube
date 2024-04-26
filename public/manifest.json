@@ -1,24 +1,17 @@
 {
   "manifest_version": 3,
   "name": "Focused Youtube",
-  "description": "Open source extension that removes comments/recommendations from Youtube: https://github.com/makaroni4/focused_youtube",
-  "version": "0.10",
-  "author": "Anatoli Makarevich",
+  "description": "Open source extension that removes comments/recommendations from Youtube: https://github.com/OSamuelAlmeida/focused_youtube",
+  "version": "0.11",
+  "author": "Anatoli Makarevich <makaroni4@gmail.com>, Samuel Almeida <samuel@bravion.dev>",
   "icons": {
     "128": "extension_icon.png"
   },
   "content_scripts": [
     {
-      "matches": [
-        "https://www.youtube.com/*",
-        "https://m.youtube.com/*"
-      ],
-      "js": [
-        "assets/extension.js"
-      ],
-      "css": [
-        "assets/extension.css"
-      ],
+      "matches": ["https://www.youtube.com/*", "https://m.youtube.com/*"],
+      "js": ["assets/extension.js"],
+      "css": ["assets/extension.css"],
       "run_at": "document_end",
       "all_frames": true
     }
@@ -26,13 +19,8 @@
   "action": {
     "default_popup": "popup.html"
   },
-  "host_permissions": [
-    "https://www.youtube.com/*",
-    "https://m.youtube.com/*"
-  ],
-  "permissions": [
-    "storage"
-  ],
+  "host_permissions": ["https://www.youtube.com/*", "https://m.youtube.com/*"],
+  "permissions": ["storage"],
   "web_accessible_resources": [
     {
       "resources": [
@@ -44,12 +32,8 @@
         "images/search_icon_dark.svg",
         "images/youtube_logo_dark.png",
         "images/extension_icon.png"
-
       ],
-      "matches": [
-        "https://www.youtube.com/*",
-        "https://m.youtube.com/*"
-      ]
+      "matches": ["https://www.youtube.com/*", "https://m.youtube.com/*"]
     }
   ]
 }

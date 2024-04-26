@@ -8,6 +8,14 @@
     writeStorageData,
   } from "@js/chrome-storage"
 
+  const reloadPageIfYoutube = () => {
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+      if (tabs[0].url.includes("youtube.com")) {
+        chrome.tabs.reload(tabs[0].id)
+      }
+    })
+  }
+
   export default {
     components: {
       Toggle,
@@ -54,20 +62,28 @@
       })
     },
     methods: {
+      handleEnabledToggle(val) {
+        writeStorageData(ENABLED_KEY, val, () => {
+          this.enabled = val
+          this.showCommentsToggle = val
+          this.showInfiniteScrollToggle = val
+        })
+
+        reloadPageIfYoutube()
+      },
       handleCommentsToggle(val) {
         writeStorageData(SETTINGS_COMMENTS_KEY, val, () => {
           this.commentsSectionEnabled = val
         })
+
+        reloadPageIfYoutube()
       },
       handleInfiniteScrollToggle(val) {
         writeStorageData(INFINITE_SCROLL_KEY, val, () => {
           this.infiniteScrollEnabled = val
         })
-      },
-      handleEnabledToggle(val) {
-        writeStorageData(ENABLED_KEY, val, () => {
-          this.enabled = val
-        })
+
+        reloadPageIfYoutube()
       },
     },
   }
@@ -76,6 +92,15 @@
 <template>
   <div class="focused-youtube-settings">
     <div class="focused-youtube-settings__toggles">
+      <Toggle
+        v-if="showEnabled"
+        title="Enable Focused Youtube"
+        name="Enabled"
+        class="focused-youtube-settings__toggle"
+        :toggled="enabled"
+        @toggle="handleEnabledToggle"
+      />
+
       <Toggle
         v-if="showCommentsToggle"
         title="Show comments"
@@ -92,15 +117,6 @@
         class="focused-youtube-settings__toggle"
         :toggled="infiniteScrollEnabled"
         @toggle="handleInfiniteScrollToggle"
-      />
-
-      <Toggle
-        v-if="showEnabled"
-        title="Enable extension"
-        name="Enabled"
-        class="focused-youtube-settings__toggle"
-        :toggled="enabled"
-        @toggle="handleEnabledToggle"
       />
     </div>
   </div>

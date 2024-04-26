@@ -11,9 +11,9 @@ const readStorageKeys = (storageKeys, callback) => {
   })
 }
 
+const ENABLED_KEY = "settings:enabled"
 const SETTINGS_COMMENTS_KEY = "settings:comments"
 const INFINITE_SCROLL_KEY = "settings:infinite_scroll"
-const ENABLED_KEY = "settings:enabled"
 
 import "./style-overrides.css"
 
@@ -34,7 +34,6 @@ const enableTheaterMode = () => {
   const oneYearFromNow = new Date()
   oneYearFromNow.setFullYear(oneYearFromNow.getFullYear() + 1)
 
-  document.cookie = "wide=; Max-Age=0; path=/; domain=.youtube.com"
   document.cookie =
     "wide=1; expires=" +
     oneYearFromNow.toUTCString() +
