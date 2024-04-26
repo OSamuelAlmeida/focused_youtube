@@ -1,8 +1,15 @@
 body.focused-youtube-popup-page {
   width: 300px;
 
-  background-color: #FFF;
+  background-color: #fff;
 
   font-family: Roboto, system-ui, sans-serif;
   color: #282828;
+}
+
+@media (prefers-color-scheme: dark) {
+  body.focused-youtube-popup-page {
+    background-color: #282828;
+    color: #fff;
+  }
 }

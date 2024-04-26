@@ -43,4 +43,12 @@
       color: #5f6368;
     }
   }
+
+  @media (prefers-color-scheme: dark) {
+    .focused-youtube-footer {
+      &__link {
+        color: #fff;
+      }
+    }
+  }
 </style>

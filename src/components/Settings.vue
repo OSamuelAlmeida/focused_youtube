@@ -38,7 +38,13 @@
           this.commentsSectionEnabled = value
         }
 
-        this.showCommentsToggle = true
+        readStorageKey(ENABLED_KEY, (value) => {
+          if (typeof value === "undefined") {
+            this.showCommentsToggle = false
+          } else {
+            this.showCommentsToggle = value
+          }
+        })
       })
 
       readStorageKey(INFINITE_SCROLL_KEY, (value) => {
@@ -48,7 +54,13 @@
           this.infiniteScrollEnabled = value
         }
 
-        this.showInfiniteScrollToggle = true
+        readStorageKey(ENABLED_KEY, (value) => {
+          if (typeof value === "undefined") {
+            this.showInfiniteScrollToggle = false
+          } else {
+            this.showInfiniteScrollToggle = value
+          }
+        })
       })
 
       readStorageKey(ENABLED_KEY, (value) => {
